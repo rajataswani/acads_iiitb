@@ -1,0 +1,171 @@
+<!doctype html><html><head><meta charset="utf-8"><title>ML Quick Revision Notes</title>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:30px;line-height:1.4;color:#111}
+h1{font-size:28px}h2{border-bottom:2px solid;padding-bottom:4px;margin-top:30px}h3{margin-bottom:5px}
+.box{background:#f5f5f5;border-left:4px solid #333;padding:10px;margin:10px 0}
+table{border-collapse:collapse;width:100%;margin:10px 0}th,td{border:1px solid #bbb;padding:7px;vertical-align:top}th{background:#f5f5f5}
+.math{overflow-x:auto;padding:5px}.small{color:#555;font-size:12px}
+@media print{body{font-size:10.5pt;padding:10mm}h2{page-break-before:always}.box,table{break-inside:avoid}}
+</style></head><body>
+
+<h1>Machine Learning — Quick Revision Notes</h1>
+<p>Exam-focused: overview → formulas → numerical-solving points.</p>
+<div class="box"><b>Status:</b> Naïve Bayes = REVISIT LATER. QDA/LDA = REVISIT LATER.</div>
+
+<h2>1. Linear Regression</h2>
+<h3>Overview</h3><p>Predicts a continuous numerical output by choosing parameters that minimize squared prediction error.</p>
+<h3>Formulas</h3>
+<div class="math">\[\hat y=w_0+w_1x\]</div>
+<div class="math">\[\hat y=w_0+\sum_{j=1}^{d}w_jx_j\]</div>
+<div class="math">\[\hat y=Xw\]</div>
+<div class="math">\[L(w)=\sum_i(y_i-\hat y_i)^2=\|y-Xw\|^2=(y-Xw)^T(y-Xw)\]</div>
+<div class="math">\[X^TXw=X^Ty\]</div>
+<div class="math">\[\boxed{w^*=(X^TX)^{-1}X^Ty}\]</div>
+<div class="math">\[w_1=\frac{\sum_i(x_i-\bar x)(y_i-\bar y)}{\sum_i(x_i-\bar x)^2},\quad w_0=\bar y-w_1\]</div>
+<div class="math">\[\mathcal L=\frac1n(y-Xw)^T(y-Xw)\]</div>
+<h3>Numerical points</h3><ul><li>Put a column of 1s in \(X\) for \(w_0\).</li><li>Know dimensions: \(X:n\times(d+1)\), \(w:(d+1)\times1\).</li><li>Use the closed form when \(X^TX\) is invertible/full column rank.</li><li>Simple regression can use slope/intercept formulas.</li></ul>
+
+<h2>2. Polynomial Regression</h2>
+<h3>Overview</h3><p>Adds powers of features to model curves. Nonlinear in \(x\), but linear in parameters.</p>
+<h3>Formulas</h3>
+<div class="math">\[\hat y=w_0+w_1x+w_2x^2\]</div>
+<div class="math">\[\hat y=\sum_{k=0}^{d}w_kx^k\]</div>
+<div class="math">\[f(x;w)=\sum_{k=0}^{d}w_kh_k(x)\]</div>
+<div class="math">\[w^*=(X^TX)^{-1}X^Ty\]</div>
+<h3>Numerical points</h3><ul><li>Build columns \(1,x,x^2,\ldots,x^d\).</li><li>Use least squares after feature expansion.</li><li>Higher degree → more flexibility but greater overfitting risk.</li></ul>
+
+<h2>3. Bias–Variance</h2>
+<h3>Overview</h3><p>Explains the trade-off between a model being too simple and too sensitive to training data.</p>
+<div class="math">\[y=f(x)+\epsilon\]</div>
+<div class="math">\[\bar{\hat f}(x)=E[\hat f(x)]\]</div>
+<div class="math">\[\boxed{E[(y-\hat f(x))^2]=Bias^2+Variance+\sigma^2}\]</div>
+<div class="math">\[Bias^2=(E[\hat f(x)]-f(x))^2\]</div>
+<div class="math">\[Variance=E[(\hat f(x)-E[\hat f(x)])^2]\]</div>
+<h3>Numerical/conceptual points</h3><ul><li>High bias → underfitting.</li><li>High variance → overfitting.</li><li>Complexity ↑ → bias tends ↓, variance tends ↑.</li><li>Noise is irreducible.</li></ul>
+
+<h2>4. Cross Validation</h2>
+<h3>Overview</h3><p>Estimates generalization performance by repeatedly training and validating on different folds.</p>
+<div class="math">\[\text{CV error}=\frac1K\sum_{k=1}^{K}\text{ValidationError}_k\]</div>
+<div class="math">\[\text{LOOCV}:K=n\]</div>
+<h3>Numerical points</h3><ul><li>K-fold: train on \(K-1\) folds, validate on 1; repeat K times.</li><li>Average the validation errors.</li><li>The final test set is separate.</li></ul>
+
+<h2>5. Regularization</h2>
+<h3>Overview</h3><p>Adds a penalty to discourage overly large parameters and reduce overfitting.</p>
+<div class="math">\[\boxed{L'=L+\lambda P(w)}\]</div>
+<div class="math">\[L_{L2}=\frac1n(y-Xw)^T(y-Xw)+\lambda w^Tw=L+\lambda\sum_jw_j^2\]</div>
+<div class="math">\[\boxed{w^*=(X^TX+\lambda I)^{-1}X^Ty}\]</div>
+<div class="math">\[L_{L1}=L+\lambda\sum_j|w_j|\]</div>
+<div class="math">\[\left|\frac{2}{n}x_j^T(y-Xw)\right|\le\lambda\]</div>
+<h3>Numerical points</h3><ul><li>L1=Lasso; L2=Ridge.</li><li>\(\lambda=0\) → OLS.</li><li>L1 can make coefficients exactly zero; L2 generally shrinks without exact zeros.</li><li>Increasing \(\lambda\) strengthens regularization.</li><li>For Ridge, use \(X^TX+\lambda I\).</li></ul>
+
+<h2>6. Maximum Likelihood Estimation (MLE)</h2>
+<h3>Overview</h3><p>Chooses parameter values that make the observed data most likely under an assumed probability model.</p>
+<div class="math">\[y_i=f(x_i;w)+\epsilon_i\]</div>
+<div class="math">\[\epsilon_i\sim N(0,\sigma^2)\]</div>
+<div class="math">\[p(y_i|x_i,w,\sigma^2)=\frac1{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y_i-f(x_i;w))^2}{2\sigma^2}\right)\]</div>
+<div class="math">\[L(w,\sigma^2)=\prod_i p(y_i|x_i,w,\sigma^2)\]</div>
+<div class="math">\[(w^*,\sigma^{2*})=\arg\max L(w,\sigma^2)\]</div>
+<div class="math">\[\log L=-\frac n2\log(2\pi)-n\log\sigma-\frac1{2\sigma^2}\sum_i(y_i-f(x_i;w))^2\]</div>
+<div class="math">\[w^*=(X^TX)^{-1}X^Ty\]</div>
+<div class="math">\[\boxed{\sigma^{2*}=\frac1n\sum_i(y_i-\hat y_i)^2}\]</div>
+<div class="math">\[\exp(a)=e^a\]</div>
+<h3>Numerical points</h3><ul><li>Decode \(x_i,y_i,w,\epsilon_i,\sigma^2\) before calculating.</li><li>Independent observations → multiply likelihoods.</li><li>Log turns products into sums and preserves the maximizer.</li><li>Gaussian MLE for \(w\) is equivalent to least squares.</li><li>After finding \(w^*\), use residuals to calculate \(\sigma^{2*}\).</li></ul>
+
+<h2>7. Bayesian Approach</h2>
+<h3>Overview</h3><p>Combines prior belief and observed data to obtain a posterior belief about a parameter.</p>
+<div class="math">\[\boxed{P(\theta|D)=\frac{P(D|\theta)P(\theta)}{P(D)}}\]</div>
+<div class="math">\[P(\theta|D)\propto P(D|\theta)P(\theta)\]</div>
+<table><tr><th>Term</th><th>Meaning</th></tr><tr><td>\(P(\theta|D)\)</td><td>Posterior</td></tr><tr><td>\(P(D|\theta)\)</td><td>Likelihood</td></tr><tr><td>\(P(\theta)\)</td><td>Prior</td></tr><tr><td>\(P(D)\)</td><td>Evidence/normalizer</td></tr></table>
+<h3>Numerical points</h3><ul><li>Map each quantity to prior/likelihood/posterior/evidence first.</li><li>For relative posterior comparisons, use proportionality.</li><li>MLE uses data; Bayesian reasoning uses prior + data.</li></ul>
+
+<h2>8. Bayes Classifier</h2>
+<h3>Overview</h3><p>Assigns a new input to the class with the highest posterior probability.</p>
+<div class="math">\[\boxed{P(Y=c|X=x)=\frac{P(X=x|Y=c)P(Y=c)}{P(X=x)}}\]</div>
+<div class="math">\[\eta(x)=P(Y=+1|X=x)\]</div>
+<div class="math">\[P(Y=-1|X=x)=1-\eta(x)\]</div>
+<div class="math">\[\boxed{h^*(x)=\begin{cases}+1,&\eta(x)>\frac12\\-1,&\eta(x)<\frac12\end{cases}}\]</div>
+<div class="math">\[\boxed{P(+1|x)=\frac{P(x|+1)P(+1)}{P(x|+1)P(+1)+P(x|-1)P(-1)}}\]</div>
+<h3>Numerical points</h3><ul><li>To calculate posterior, numerator = class-conditional × class prior.</li><li>For classification only, compare \(P(x|c)P(c)\); the denominator is common.</li><li>Never confuse \(P(x|c)\) with \(P(c|x)\).</li></ul>
+
+<h2>9. Multivariate Gaussian</h2>
+<h3>Overview</h3><p>Models the distribution of multiple features jointly. In Bayes classification it supplies the class-conditional density \(P(x|y)\).</p>
+<div class="math">\[p(x)=\frac1{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)\]</div>
+<div class="math">\[\operatorname{Var}(X)=\frac1n\sum_i(x_i-\mu)^2\]</div>
+<div class="math">\[\sigma=\sqrt{\sigma^2}\]</div>
+<div class="math">\[\operatorname{Cov}(X,Y)=\frac1n\sum_i(x_i-\mu_X)(y_i-\mu_Y)\]</div>
+<div class="math">\[\Sigma=\begin{bmatrix}\operatorname{Var}(X_1)&\operatorname{Cov}(X_1,X_2)\\\operatorname{Cov}(X_2,X_1)&\operatorname{Var}(X_2)\end{bmatrix}\]</div>
+<div class="math">\[\boxed{p(x|y)=\frac1{(2\pi)^{d/2}|\Sigma|^{1/2}}\exp\left[-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)\right]}\]</div>
+<div class="math">\[(x-\mu)^T\Sigma^{-1}(x-\mu)\]</div>
+<div class="math">\[\Sigma=\begin{bmatrix}\sigma_1^2&0\\0&\sigma_2^2\end{bmatrix}\Rightarrow\frac{(x_1-\mu_1)^2}{\sigma_1^2}+\frac{(x_2-\mu_2)^2}{\sigma_2^2}\]</div>
+<h3>Numerical points</h3><ul><li>Diagonal of \(\Sigma\) = variances; off-diagonal = covariances.</li><li>Identify \(d,\mu,\Sigma,|\Sigma|,\Sigma^{-1}\).</li><li>Calculate the Gaussian density for each class separately.</li><li>Then multiply each density by its class prior for Bayes classification.</li></ul>
+<div class="box"><b>Naïve Bayes: REVISIT LATER.</b><br><b>QDA/LDA: REVISIT LATER.</b></div>
+
+<h2>10. Logistic Regression</h2>
+<h3>Overview</h3><p>A binary classification method. It computes a linear score and converts it into a probability using the sigmoid function.</p>
+<div class="math">\[x=[1,x_1,\ldots,x_d]^T,\quad w=[w_0,w_1,\ldots,w_d]^T\]</div>
+<div class="math">\[z=w^Tx=w_0+w_1x_1+\cdots+w_dx_d\]</div>
+<div class="math">\[\boxed{\sigma(z)=\frac1{1+e^{-z}}}\]</div>
+<div class="math">\[\boxed{P(Y=1|x)=\sigma(w^Tx)=\frac1{1+e^{-w^Tx}}}\]</div>
+<div class="math">\[P(Y=0|x)=1-\sigma(w^Tx)=\frac1{1+e^{w^Tx}}\]</div>
+<div class="math">\[\boxed{h^*(x)=\begin{cases}1,&w^Tx>0\\0,&\text{otherwise}\end{cases}}\]</div>
+<div class="math">\[\boxed{w^Tx=0}\quad\text{decision boundary}</div>
+<div class="math">\[\boxed{\log\frac{P(+1|x)}{P(-1|x)}=w^Tx}\]</div>
+<h3>MLE / loss formulas</h3>
+<div class="math">\[P(y_i|x_i;w)=\frac1{1+\exp(-y_iw^Tx_i)}\quad(y_i\in\{-1,+1\})\]</div>
+<div class="math">\[L(w)=\prod_iP(y_i|x_i;w)\]</div>
+<div class="math">\[\hat w=\arg\max_wL(w)\]</div>
+<div class="math">\[\log L=-\sum_i\log(1+e^{-y_iw^Tx_i})\]</div>
+<div class="math">\[-\log L=\sum_i\log(1+e^{-y_iw^Tx_i})\]</div>
+<div class="math">\[w_{t+1}=w_t-\eta\nabla L(w_t)\]</div>
+<div class="math">\[w_{t+1}=w_t+\eta\sum_i\frac{y_ix_i}{1+e^{y_iw_t^Tx_i}}\]</div>
+<h3>0/1 formulation</h3>
+<div class="math">\[P(y_i|x_i;w)=\hat y_i^{y_i}(1-\hat y_i)^{1-y_i}\]</div>
+<div class="math">\[L(w)=\prod_i\hat y_i^{y_i}(1-\hat y_i)^{1-y_i}\]</div>
+<div class="math">\[\log L=\sum_i[y_i\log\hat y_i+(1-y_i)\log(1-\hat y_i)]\]</div>
+<div class="math">\[\boxed{BCE=-\sum_i[y_i\log\hat y_i+(1-y_i)\log(1-\hat y_i)]}\]</div>
+<h3>Numerical points</h3><ul><li>Compute \(z=w^Tx\), then sigmoid.</li><li>\(P>0.5\iff w^Tx>0\).</li><li>Likelihood multiplies examples; log-likelihood adds them.</li><li>BCE = negative log-likelihood for the binary 0/1 formulation.</li><li>No general closed-form solution like linear regression; use iterative gradient optimization.</li></ul>
+
+<h2>11. Decision Trees / Regression Trees</h2>
+<h3>Overview</h3><p>A non-parametric method that repeatedly splits the input space. In regression, each leaf predicts a numerical value and the preferred split minimizes squared-error loss.</p>
+<div class="math">\[S=\{(x_1,y_1),\ldots,(x_n,y_n)\}\]</div>
+<div class="math">\[\mathcal X=\mathbb R^d,\quad\mathcal Y=\mathbb R\]</div>
+<div class="math">\[f_{\mathcal T}(x_i)=r_{l(x_i)}\]</div>
+<div class="math">\[\boxed{r_l^*=\arg\min_{r\in\mathbb R}\frac1n\sum_{i:x_i\in\mathcal X_l}(y_i-r)^2}\]</div>
+<div class="math">\[\boxed{r_l^*=\frac1{n_l}\sum_{i:x_i\in\mathcal X_l}y_i}\]</div>
+<div class="math">\[\boxed{\mathcal L=\frac1n\sum_{i=1}^{n}(y_i-f_{\mathcal T}(x_i))^2}\]</div>
+<div class="math">\[\mathcal L=\frac1n\sum_{l\in L(\mathcal T)}\sum_{i:x_i\in\mathcal X_l}(y_i-r_l^*)^2\]</div>
+<h3>Numerical procedure</h3><ol><li>Choose candidate feature/threshold.</li><li>Split the data.</li><li>Calculate mean \(y\) in every new leaf.</li><li>Calculate total MSE/loss.</li><li>Choose the minimum-loss split.</li><li>Repeat recursively.</li></ol>
+<h3>Professor's House Example</h3>
+<table><tr><th>Candidate</th><th>Loss</th></tr>
+<tr><td>No split</td><td>\(334.70\), overall mean \(63.37\)</td></tr>
+<tr><td>Location</td><td>\(497.55\)</td></tr>
+<tr><td>Bedrooms \(\le3\)</td><td>\(160.67\)</td></tr>
+<tr><td>Age</td><td>\(146.69\)</td></tr>
+<tr><td>Size \(\le1300\)</td><td>\(165.437\)</td></tr>
+<tr><td>Size with multiple regions</td><td>\(90.34\)</td></tr>
+</table>
+<div class="box"><b>Remember:</b> The tree groups houses with similar prices. Mean = best leaf prediction under squared error. Minimum resulting loss = best split. A very deep tree can reach training loss 0 but overfit.</div>
+<h3>Stopping / overfitting</h3><ul><li>Minimum number of examples in a leaf.</li><li>Small enough target variance.</li><li>Restrict candidate thresholds.</li><li>Purpose: control complexity and improve generalization.</li></ul>
+<h3>Classification-tree formulas (recognition only)</h3>
+<div class="math">\[H_l=-p_l^1\log_2(p_l^1)-(1-p_l^1)\log_2(1-p_l^1)\]</div>
+<div class="math">\[G_l=p_l^1(1-p_l^1)\]</div>
+
+<h2>Last-minute Formula Checklist</h2>
+<table>
+<tr><th>Topic</th><th>Must-recognize formula</th></tr>
+<tr><td>Linear Regression</td><td>\(w^*=(X^TX)^{-1}X^Ty\)</td></tr>
+<tr><td>Ridge</td><td>\(w^*=(X^TX+\lambda I)^{-1}X^Ty\)</td></tr>
+<tr><td>Gaussian MLE</td><td>\(\sigma^{2*}=\frac1n\sum_i(y_i-\hat y_i)^2\)</td></tr>
+<tr><td>Bayes</td><td>\(P(\theta|D)\propto P(D|\theta)P(\theta)\)</td></tr>
+<tr><td>Bayes Classifier</td><td>\(P(c|x)\propto P(x|c)P(c)\)</td></tr>
+<tr><td>Multivariate Gaussian</td><td>\(\frac1{(2\pi)^{d/2}|\Sigma|^{1/2}}e^{-\frac12(x-\mu)^T\Sigma^{-1}(x-\mu)}\)</td></tr>
+<tr><td>Sigmoid</td><td>\(\sigma(z)=1/(1+e^{-z})\)</td></tr>
+<tr><td>Logistic boundary</td><td>\(w^Tx=0\)</td></tr>
+<tr><td>BCE</td><td>\(-\sum_i[y_i\log\hat y_i+(1-y_i)\log(1-\hat y_i)]\)</td></tr>
+<tr><td>Regression-tree leaf</td><td>\(r_l^*=(1/n_l)\sum y_i\)</td></tr>
+<tr><td>Regression-tree loss</td><td>\(\mathcal L=(1/n)\sum_i(y_i-f_{\mathcal T}(x_i))^2\)</td></tr>
+</table>
+
+</body></html>
